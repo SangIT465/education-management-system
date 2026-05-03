@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký học lại - Hệ thống quản lý đào tạo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-mark">N6</div>
+                <div class="brand-text">
+                    <h1>Đăng ký học lại</h1>
+                    <p>Nhóm 6 · Hệ thống Quản lý Đào tạo</p>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="#section-list" class="nav-pill active">Danh sách môn</a>
+                <a href="#section-register" class="nav-pill">Đăng ký</a>
+                <a href="#section-history" class="nav-pill">Lịch sử</a>
+                <a href="admin.html" class="nav-pill nav-admin">⚙ Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+
+        <!-- TOP CONTROL BAR -->
+        <section class="control-bar">
+            <div class="control-group">
+                <label>Sinh viên</label>
+                <select id="studentSelect" class="select-input">
+                    <option value="">— Chọn sinh viên —</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Đợt đăng ký</label>
+                <select id="periodSelect" class="select-input">
+                    <option value="">— Chọn đợt đăng ký —</option>
+                </select>
+            </div>
+            <button id="loadBtn" class="btn-primary">
+                <span>Tải dữ liệu</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </section>
+
+        <!-- STATS PANEL -->
+        <section class="stats-panel">
+            <div class="stat-card stat-failed">
+                <div class="stat-label">Môn cần học lại</div>
+                <div class="stat-value" id="statFailed">0</div>
+                <div class="stat-trend">điểm &lt; 5.0</div>
+            </div>
+            <div class="stat-card stat-credits">
+                <div class="stat-label">Tổng tín chỉ học lại</div>
+                <div class="stat-value" id="statCredits">0</div>
+                <div class="stat-trend">tín chỉ</div>
+            </div>
+            <div class="stat-card stat-registered">
+                <div class="stat-label">Đã đăng ký</div>
+                <div class="stat-value" id="statRegistered">0</div>
+                <div class="stat-trend">lớp học phần</div>
+            </div>
+            <div class="stat-card stat-status">
+                <div class="stat-label">Trạng thái</div>
+                <div class="stat-value-text" id="statStatus">—</div>
+                <div class="stat-trend">đợt đăng ký</div>
+            </div>
+        </section>
+
+        <!-- DANH SÁCH MÔN HỌC LẠI -->
+        <section id="section-list" class="content-section">
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">01</span>
+                    <h2>Danh sách môn cần học lại</h2>
+                </div>
+                <p class="section-desc">Các môn có điểm tổng kết &lt; 5.0 sẽ hiển thị tại đây cùng các lớp học phần đang mở.</p>
+            </div>
+
+            <div id="retakeList" class="retake-list">
+                <div class="empty-state">
+                    <div class="empty-icon">⊘</div>
+                    <p>Hãy chọn sinh viên và đợt đăng ký để xem danh sách môn cần học lại.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ĐĂNG KÝ HỌC PHẦN -->
+        <section id="section-register" class="content-section">
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">02</span>
+                    <h2>Đăng ký học phần</h2>
+                </div>
+                <p class="section-desc">Các lớp học phần đang mở. Chọn lớp và nhấn Đăng ký.</p>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" id="sectionSearch" class="search-input"
+                       placeholder="Tìm theo mã môn, tên môn, mã lớp...">
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th>Mã lớp</th>
+                            <th>Tên môn học</th>
+                            <th style="width:50px;">TC</th>
+                            <th>Loại lớp</th>
+                            <th>Học kỳ</th>
+                            <th style="width:90px;">Sĩ số</th>
+                            <th style="width:70px;">Còn</th>
+                            <th style="width:110px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courseSectionTableBody">
+                        <tr><td colspan="9" class="text-empty">Hãy chọn sinh viên và tải dữ liệu để xem danh sách lớp học phần.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- LỊCH SỬ ĐĂNG KÝ -->
+        <section id="section-history" class="content-section">
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">03</span>
+                    <h2>Lịch sử đăng ký học phần</h2>
+                </div>
+                <p class="section-desc">Các lớp học phần đã đăng ký trong hệ thống.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th>Mã lớp</th>
+                            <th>Tên môn</th>
+                            <th style="width:60px;">TC</th>
+                            <th>Loại đăng ký</th>
+                            <th>Trạng thái</th>
+                            <th>Thời điểm</th>
+                            <th style="width:100px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="8" class="text-empty">Chưa có dữ liệu</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- MODAL CONFIRM -->
+    <div id="confirmModal" class="modal-backdrop">
+        <div class="modal-card">
+            <h3 id="modalTitle">Xác nhận đăng ký</h3>
+            <p id="modalMsg">Bạn có chắc muốn đăng ký lớp học phần này?</p>
+            <div class="modal-actions">
+                <button id="modalCancel" class="btn-ghost">Hủy</button>
+                <button id="modalOk" class="btn-primary">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <p>Group 6 · Retake Course Registration · Spring Boot + SQL Server + Vanilla JS</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

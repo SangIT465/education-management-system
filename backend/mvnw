@@ -1,0 +1,37 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Maven Wrapper - simplified
+# ----------------------------------------------------------------------------
+
+# Resolve script directory
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+# Maven Wrapper jar
+WRAPPER_JAR="$DIR/.mvn/wrapper/maven-wrapper.jar"
+WRAPPER_PROPERTIES="$DIR/.mvn/wrapper/maven-wrapper.properties"
+
+# Check Java
+if [ -z "$JAVA_HOME" ]; then
+    JAVACMD=$(which java)
+else
+    JAVACMD="$JAVA_HOME/bin/java"
+fi
+
+if [ ! -x "$JAVACMD" ]; then
+    echo "Error: JAVA_HOME is not defined or java not found"
+    exit 1
+fi
+
+# Download wrapper jar if not exists
+if [ ! -f "$WRAPPER_JAR" ]; then
+    echo "Maven Wrapper jar not found. Please download manually from:"
+    echo "https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+    echo "And place it in: $DIR/.mvn/wrapper/"
+    exit 1
+fi
+
+# Run Maven
+exec "$JAVACMD" \
+    -classpath "$WRAPPER_JAR" \
+    "-Dmaven.multiModuleProjectDirectory=$DIR" \
+    org.apache.maven.wrapper.MavenWrapperMain "$@"

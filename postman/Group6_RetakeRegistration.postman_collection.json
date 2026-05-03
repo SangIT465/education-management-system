@@ -1,0 +1,108 @@
+{
+  "info": {
+    "name": "Group 6 - Retake Registration API",
+    "description": "API cho Nhóm 6: Đăng ký học lại - Đăng ký học phần",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api/v1" },
+    { "key": "studentId", "value": "PASTE-STUDENT-UUID-HERE" },
+    { "key": "periodId", "value": "PASTE-PERIOD-UUID-HERE" },
+    { "key": "sectionId", "value": "PASTE-SECTION-UUID-HERE" },
+    { "key": "registrationId", "value": "PASTE-REGISTRATION-UUID-HERE" }
+  ],
+  "item": [
+    {
+      "name": "1. NHÓM CHỨC NĂNG 1 - Danh sách môn học lại",
+      "item": [
+        {
+          "name": "GET - Lấy danh sách sinh viên",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"]
+            },
+            "description": "Lấy tất cả sinh viên - dùng để chọn ở giao diện"
+          }
+        },
+        {
+          "name": "GET - Lấy đợt đăng ký đang mở",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/registration-periods/open",
+              "host": ["{{baseUrl}}"],
+              "path": ["registration-periods", "open"]
+            },
+            "description": "Trả về danh sách registration_periods có is_open=true"
+          }
+        },
+        {
+          "name": "GET - Lấy môn cần học lại của sinh viên",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/retake/students/{{studentId}}/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["retake", "students", "{{studentId}}", "courses"]
+            },
+            "description": "API CHÍNH: Tính điểm tổng kết từ grade_components, lọc môn FAILED (<5.0), trả về kèm danh sách lớp học phần đang mở"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. NHÓM CHỨC NĂNG 2 - Đăng ký học phần",
+      "item": [
+        {
+          "name": "POST - Đăng ký học lại / học phần",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/registrations",
+              "host": ["{{baseUrl}}"],
+              "path": ["registrations"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"courseSectionId\": \"{{sectionId}}\",\n  \"registrationPeriodId\": \"{{periodId}}\",\n  \"registrationType\": \"RETAKE\",\n  \"note\": \"Đăng ký học lại môn IT101\"\n}"
+            },
+            "description": "registrationType: RETAKE | NEW | IMPROVE"
+          }
+        },
+        {
+          "name": "DELETE - Hủy đăng ký",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/registrations/{{registrationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["registrations", "{{registrationId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. NHÓM CHỨC NĂNG 3 - Lịch sử đăng ký",
+      "item": [
+        {
+          "name": "GET - Lịch sử đăng ký của sinh viên",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/registrations/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["registrations", "students", "{{studentId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

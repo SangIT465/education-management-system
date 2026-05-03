@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Quản lý dữ liệu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-mark">ADM</div>
+                <div class="brand-text">
+                    <h1>Admin Panel</h1>
+                    <p>Nhóm 6 · Quản lý dữ liệu hệ thống</p>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-pill">← Về trang chính</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+
+        <!-- TAB BAR -->
+        <div class="admin-tab-bar">
+            <button class="tab-btn active" data-tab="students">
+                <span class="tab-icon">👤</span> Sinh viên
+            </button>
+            <button class="tab-btn" data-tab="courses">
+                <span class="tab-icon">📚</span> Môn học
+            </button>
+            <button class="tab-btn" data-tab="semesters">
+                <span class="tab-icon">📅</span> Học kỳ
+            </button>
+            <button class="tab-btn" data-tab="sections">
+                <span class="tab-icon">🏫</span> Lớp học phần
+            </button>
+            <button class="tab-btn" data-tab="grades">
+                <span class="tab-icon">📊</span> Điểm số
+            </button>
+            <button class="tab-btn" data-tab="periods">
+                <span class="tab-icon">🗓️</span> Đợt đăng ký
+            </button>
+        </div>
+
+        <!-- TAB: STUDENTS -->
+        <div id="tab-students" class="tab-panel active">
+            <div class="panel-toolbar">
+                <div>
+                    <h2>Danh sách sinh viên</h2>
+                    <p class="panel-desc">Quản lý thông tin sinh viên trong hệ thống</p>
+                </div>
+                <button class="btn-add" onclick="openCreate('students')">+ Thêm sinh viên</button>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Mã SV</th>
+                            <th>Họ và tên</th>
+                            <th>Email</th>
+                            <th>Lớp</th>
+                            <th style="width:130px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-students">
+                        <tr><td colspan="6" class="text-empty">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: COURSES -->
+        <div id="tab-courses" class="tab-panel">
+            <div class="panel-toolbar">
+                <div>
+                    <h2>Danh sách môn học</h2>
+                    <p class="panel-desc">Quản lý các môn học trong chương trình đào tạo</p>
+                </div>
+                <button class="btn-add" onclick="openCreate('courses')">+ Thêm môn học</button>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Mã môn</th>
+                            <th>Tên môn học</th>
+                            <th style="width:60px">TC</th>
+                            <th>Mô tả</th>
+                            <th style="width:130px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-courses">
+                        <tr><td colspan="6" class="text-empty">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: SEMESTERS -->
+        <div id="tab-semesters" class="tab-panel">
+            <div class="panel-toolbar">
+                <div>
+                    <h2>Danh sách học kỳ</h2>
+                    <p class="panel-desc">Quản lý các học kỳ trong năm học</p>
+                </div>
+                <button class="btn-add" onclick="openCreate('semesters')">+ Thêm học kỳ</button>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Mã HK</th>
+                            <th>Tên học kỳ</th>
+                            <th>Năm học</th>
+                            <th>Ngày bắt đầu</th>
+                            <th>Ngày kết thúc</th>
+                            <th style="width:130px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-semesters">
+                        <tr><td colspan="7" class="text-empty">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: COURSE SECTIONS -->
+        <div id="tab-sections" class="tab-panel">
+            <div class="panel-toolbar">
+                <div>
+                    <h2>Danh sách lớp học phần</h2>
+                    <p class="panel-desc">Quản lý các lớp học phần đang và sắp mở</p>
+                </div>
+                <button class="btn-add" onclick="openCreate('sections')">+ Thêm lớp HP</button>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Mã lớp HP</th>
+                            <th>Môn học</th>
+                            <th>Học kỳ</th>
+                            <th>Loại lớp</th>
+                            <th style="width:80px">Sĩ số</th>
+                            <th>Trạng thái</th>
+                            <th style="width:130px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-sections">
+                        <tr><td colspan="8" class="text-empty">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: GRADES -->
+        <div id="tab-grades" class="tab-panel">
+            <div class="panel-toolbar">
+                <div>
+                    <h2>Quản lý điểm số</h2>
+                    <p class="panel-desc">Xem và chỉnh sửa điểm thành phần của sinh viên</p>
+                </div>
+            </div>
+            <div class="grade-filter-bar">
+                <label>Chọn sinh viên:</label>
+                <select id="gradeStudentSelect" class="select-input" style="min-width:280px">
+                    <option value="">— Chọn sinh viên —</option>
+                </select>
+                <button class="btn-load" onclick="loadGrades()">Tải điểm</button>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Mã môn</th>
+                            <th>Tên môn học</th>
+                            <th>Lớp HP</th>
+                            <th>Thành phần</th>
+                            <th style="width:80px">Trọng số</th>
+                            <th style="width:70px">Điểm</th>
+                            <th style="width:100px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-grades">
+                        <tr><td colspan="8" class="text-empty">Chọn sinh viên để xem điểm.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: REGISTRATION PERIODS -->
+        <div id="tab-periods" class="tab-panel">
+            <div class="panel-toolbar">
+                <div>
+                    <h2>Đợt đăng ký học phần</h2>
+                    <p class="panel-desc">Tạo và quản lý các đợt đăng ký học lại</p>
+                </div>
+                <button class="btn-add" onclick="openCreate('periods')">+ Thêm đợt đăng ký</button>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Tên đợt đăng ký</th>
+                            <th>Học kỳ</th>
+                            <th>Bắt đầu</th>
+                            <th>Kết thúc</th>
+                            <th style="width:80px">TC min/max</th>
+                            <th style="width:80px">Trạng thái</th>
+                            <th style="width:130px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-periods">
+                        <tr><td colspan="8" class="text-empty">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ADMIN MODAL -->
+    <div id="adminModal" class="admin-modal-backdrop">
+        <div class="admin-modal-card">
+            <div class="admin-modal-header">
+                <h3 id="adminModalTitle">Tiêu đề</h3>
+                <button class="modal-close-btn" onclick="closeAdminModal()">✕</button>
+            </div>
+            <div id="adminModalBody" class="admin-modal-body">
+                <!-- Dynamic form content -->
+            </div>
+            <div class="admin-modal-footer">
+                <button class="btn-ghost" onclick="closeAdminModal()">Hủy</button>
+                <button class="btn-primary" id="adminModalSaveBtn" onclick="saveModal()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <p>Group 6 · Admin Panel · Spring Boot + SQL Server</p>
+    </footer>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
