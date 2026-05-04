@@ -206,6 +206,10 @@
             const pass = document.getElementById('regPass').value;
             const passConfirm = document.getElementById('regPassConfirm').value;
 
+            if (pass.length < 4) {
+                showAlert('registerAlert', 'Mật khẩu phải có ít nhất 4 ký tự', 'error');
+                return;
+            }
             if (pass !== passConfirm) {
                 showAlert('registerAlert', 'Mật khẩu xác nhận không khớp', 'error');
                 return;

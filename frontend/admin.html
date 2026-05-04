@@ -173,8 +173,9 @@
             <div class="panel-toolbar">
                 <div>
                     <h2>Quản lý điểm số</h2>
-                    <p class="panel-desc">Xem và chỉnh sửa điểm thành phần của sinh viên</p>
+                    <p class="panel-desc">Xem và nhập điểm thành phần. Điểm tổng kết &lt; 5.0 → tự động phân loại cần học lại.</p>
                 </div>
+                <button class="btn-add" onclick="openAddGrade()">+ Thêm điểm</button>
             </div>
             <div class="grade-filter-bar">
                 <label>Chọn sinh viên:</label>
@@ -188,13 +189,13 @@
                     <thead>
                         <tr>
                             <th style="width:40px">#</th>
-                            <th>Mã môn</th>
-                            <th>Tên môn học</th>
-                            <th>Lớp HP</th>
-                            <th>Thành phần</th>
+                            <th>Mã môn / TP</th>
+                            <th>Tên môn học / Thành phần</th>
+                            <th style="width:100px">Lớp HP</th>
+                            <th style="width:60px"></th>
                             <th style="width:80px">Trọng số</th>
-                            <th style="width:70px">Điểm</th>
-                            <th style="width:100px">Thao tác</th>
+                            <th style="width:80px">Điểm</th>
+                            <th style="width:110px">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody id="tb-grades">

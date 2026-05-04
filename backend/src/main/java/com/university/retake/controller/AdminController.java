@@ -25,6 +25,7 @@ public class AdminController {
     private final CourseSectionRepository sectionRepository;
     private final GradeComponentRepository gradeComponentRepository;
     private final RegistrationPeriodRepository periodRepository;
+    private final StudentCourseSectionRepository scsRepository;
 
     // ========== STUDENTS ==========
 
@@ -332,6 +333,87 @@ public class AdminController {
             return m;
         }).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @PostMapping("/grade-components")
+    @Transactional
+    public ResponseEntity<ApiResponse<Map<String, Object>>> createGradeComponents(@RequestBody Map<String, Object> body) {
+        UUID studentId  = UUID.fromString((String) body.get("studentId"));
+        UUID sectionId  = UUID.fromString((String) body.get("courseSectionId"));
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên"));
+        CourseSection section = sectionRepository.findById(sectionId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy lớp học phần"));
+
+        // Tìm hoặc tạo student_course_section với status=completed
+        StudentCourseSection scs = scsRepository
+                .findByStudentIdAndSectionId(studentId, sectionId)
+                .orElse(null);
+
+        if (scs == null) {
+            scs = new StudentCourseSection();
+            scs.setStudent(student);
+            scs.setCourseSection(section);
+            scs.setStatus("completed");
+            scs.setRegisteredAt(LocalDateTime.now());
+            scs.setIsActive(true);
+            scsRepository.save(scs);
+        } else {
+            scs.setStatus("completed");
+            scsRepository.save(scs);
+        }
+
+        // Xóa điểm cũ nếu có (ghi đè) — dùng deleteAllInBatch để tránh N+1 queries
+        List<GradeComponent> old = gradeComponentRepository.findByStudentCourseSectionId(scs.getId());
+        if (!old.isEmpty()) {
+            gradeComponentRepository.deleteAllInBatch(old);
+        }
+
+        // Tạo điểm thành phần mới
+        List<?> components = (List<?>) body.get("components");
+        BigDecimal totalScore = BigDecimal.ZERO;
+
+        for (Object comp : components) {
+            Map<?, ?> c = (Map<?, ?>) comp;
+            GradeComponent gc = new GradeComponent();
+            gc.setStudentCourseSection(scs);
+            gc.setComponentCode((String) c.get("componentCode"));
+            gc.setComponentName((String) c.get("componentName"));
+            gc.setWeightPercentage(new BigDecimal(c.get("weightPercentage").toString()));
+            gc.setScore(new BigDecimal(c.get("score").toString()));
+            gc.setIsActive(true);
+            gradeComponentRepository.save(gc);
+            totalScore = totalScore.add(
+                gc.getScore().multiply(gc.getWeightPercentage())
+                             .divide(new BigDecimal("100"), 2, java.math.RoundingMode.HALF_UP)
+            );
+        }
+
+        // Phân loại tự động
+        String status = totalScore.compareTo(new BigDecimal("5.0")) < 0 ? "FAILED"
+                      : totalScore.compareTo(new BigDecimal("7.0")) < 0 ? "IMPROVABLE"
+                      : "PASSED";
+        String label  = "FAILED".equals(status) ? "Cần học lại"
+                      : "IMPROVABLE".equals(status) ? "Có thể cải thiện" : "Đạt";
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("scsId", scs.getId());
+        result.put("totalScore", totalScore);
+        result.put("status", status);
+        result.put("label", label);
+        result.put("componentCount", components.size());
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @DeleteMapping("/grade-components/section/{scsId}")
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> deleteGradesByScs(@PathVariable UUID scsId) {
+        List<GradeComponent> list = gradeComponentRepository.findByStudentCourseSectionId(scsId);
+        gradeComponentRepository.deleteAll(list);
+        StudentCourseSection scs = scsRepository.findById(scsId).orElse(null);
+        if (scs != null) { scs.setIsActive(false); scsRepository.save(scs); }
+        return ResponseEntity.ok(ApiResponse.ok("Đã xóa điểm"));
     }
 
     @PutMapping("/grade-components/{id}")

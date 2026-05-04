@@ -228,21 +228,65 @@ function renderGrades() {
     tbody.innerHTML = '<tr><td colspan="8" class="text-empty">Sinh viên này chưa có điểm thành phần nào.</td></tr>';
     return;
   }
-  tbody.innerHTML = S.grades.map((g, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td><strong class="font-mono">${g.courseCode}</strong></td>
-      <td>${g.courseName}</td>
-      <td class="font-mono" style="font-size:12px">${g.sectionCode}</td>
-      <td>${g.componentName || g.componentCode || '—'}</td>
-      <td style="text-align:center">${g.weightPercentage ?? '—'}%</td>
-      <td style="text-align:center;font-weight:700;color:${(g.score ?? 0) >= 5 ? 'var(--green)' : 'var(--accent)'}">
-        ${g.score ?? '—'}
+
+  // Group components by scsId (one section per group)
+  const groups = new Map();
+  S.grades.forEach(g => {
+    const key = g.scsId || (g.courseCode + '_' + g.sectionCode);
+    if (!groups.has(key)) {
+      groups.set(key, { scsId: g.scsId, courseCode: g.courseCode, courseName: g.courseName, sectionCode: g.sectionCode, components: [] });
+    }
+    groups.get(key).components.push(g);
+  });
+
+  const clsColor = { FAILED: 'var(--accent)', IMPROVABLE: 'var(--amber)', PASSED: 'var(--green)' };
+  const clsBg    = { FAILED: 'var(--accent-soft)', IMPROVABLE: 'var(--amber-soft)', PASSED: 'var(--green-soft)' };
+  const clsLabel = { FAILED: 'Cần học lại', IMPROVABLE: 'Cải thiện', PASSED: 'Đạt' };
+
+  let html = '';
+  groups.forEach(group => {
+    let total = 0;
+    group.components.forEach(c => { total += (parseFloat(c.score) || 0) * (parseFloat(c.weightPercentage) || 0) / 100; });
+    const cls = total < 5 ? 'FAILED' : total < 7 ? 'IMPROVABLE' : 'PASSED';
+
+    // Section summary row
+    html += `
+    <tr style="background:#f1f5f9">
+      <td colspan="3" style="padding:10px 12px;font-weight:700;border-left:3px solid ${clsColor[cls]}">
+        <strong class="font-mono">${group.courseCode}</strong>
+        <span style="color:var(--ink-muted);margin:0 6px">—</span>${group.courseName}
       </td>
-      <td>
-        <button class="btn-edit" onclick='openEdit("grades", ${JSON.stringify(g)})'>Sửa</button>
+      <td class="font-mono" style="font-size:12px;color:var(--ink-muted)">${group.sectionCode || '—'}</td>
+      <td style="text-align:right;font-size:11px;color:var(--ink-muted);padding-right:4px">Tổng kết:</td>
+      <td style="text-align:center;font-weight:700;font-size:16px;color:${clsColor[cls]}">${total.toFixed(2)}</td>
+      <td style="text-align:center">
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:${clsBg[cls]};color:${clsColor[cls]}">${clsLabel[cls]}</span>
       </td>
-    </tr>`).join('');
+      <td style="text-align:center">
+        ${group.scsId ? `<button class="btn-del" onclick="deleteGradesByScs('${group.scsId}')">Xóa</button>` : ''}
+      </td>
+    </tr>`;
+
+    // Component detail rows
+    group.components.forEach((c, idx) => {
+      const scoreColor = (parseFloat(c.score) || 0) >= 5 ? 'var(--green)' : 'var(--accent)';
+      html += `
+      <tr>
+        <td style="color:var(--ink-muted);text-align:center;font-size:12px">${idx + 1}</td>
+        <td><strong class="font-mono" style="font-size:12px">${c.componentCode || '—'}</strong></td>
+        <td>${c.componentName || '—'}</td>
+        <td style="color:var(--ink-muted)">—</td>
+        <td style="color:var(--ink-muted)">—</td>
+        <td style="text-align:center">${c.weightPercentage ?? '—'}%</td>
+        <td style="text-align:center;font-weight:700;color:${scoreColor}">${c.score ?? '—'}</td>
+        <td>
+          <button class="btn-edit" onclick='openEdit("grades", ${JSON.stringify(c)})'>Sửa</button>
+        </td>
+      </tr>`;
+    });
+  });
+
+  tbody.innerHTML = html;
 }
 
 function renderPeriods() {
@@ -276,15 +320,120 @@ function renderPeriods() {
 }
 
 // ====================== LOAD GRADES ======================
-async function loadGrades() {
+async function loadGrades(silent = false) {
   const studentId = document.getElementById('gradeStudentSelect').value;
-  if (!studentId) { showToast('Vui lòng chọn sinh viên', 'error'); return; }
+  if (!studentId) { if (!silent) showToast('Vui lòng chọn sinh viên', 'error'); return; }
   try {
-    S.grades = await apiFetch(`${ADMIN_API}/grade-components?studentId=${studentId}`);
+    [S.grades, S.sections] = await Promise.all([
+      apiFetch(`${ADMIN_API}/grade-components?studentId=${studentId}`),
+      apiFetch(`${ADMIN_API}/course-sections`)
+    ]);
     renderGrades();
-    showToast(`Đã tải ${S.grades.length} điểm thành phần`, 'success');
+    if (!silent) showToast(`Đã tải ${S.grades.length} điểm thành phần`, 'success');
   } catch (e) {
     showToast('Lỗi tải điểm: ' + e.message, 'error');
+  }
+}
+
+async function openAddGrade() {
+  const studentId = document.getElementById('gradeStudentSelect').value;
+  if (!studentId) { showToast('Vui lòng chọn sinh viên trước', 'error'); return; }
+
+  if (!S.sections || !S.sections.length) {
+    try {
+      S.sections = await apiFetch(`${ADMIN_API}/course-sections`);
+    } catch (e) {
+      showToast('Lỗi tải danh sách lớp HP: ' + e.message, 'error');
+      return;
+    }
+  }
+
+  const sectionOptions = S.sections.map(s =>
+    `<option value="${s.id}">${s.code} — ${s.courseName} (${s.semesterName || ''})</option>`
+  ).join('');
+
+  document.getElementById('adminModalTitle').textContent = 'Thêm điểm cho sinh viên';
+  document.getElementById('adminModalBody').innerHTML = `
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:6px">CHỌN LỚP HỌC PHẦN ĐÃ HỌC</label>
+      <select id="gradeSectionId" class="form-control" required>
+        <option value="">— Chọn lớp học phần —</option>
+        ${sectionOptions}
+      </select>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Chọn lớp sinh viên đã học (kể cả lớp đã đóng)</div>
+    </div>
+
+    <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+      <label style="font-size:12px;font-weight:700;color:var(--ink-muted)">ĐIỂM THÀNH PHẦN</label>
+      <button type="button" class="btn-add" style="padding:5px 12px;font-size:12px" onclick="addGradeRow()">+ Thêm dòng</button>
+    </div>
+
+    <div id="gradeRowsWrap">
+      <div style="display:grid;grid-template-columns:1fr 1.5fr 80px 80px 32px;gap:8px;margin-bottom:6px;font-size:11px;font-weight:700;color:var(--ink-muted);padding:0 4px">
+        <span>MÃ TP</span><span>TÊN THÀNH PHẦN</span><span>TRỌNG SỐ %</span><span>ĐIỂM</span><span></span>
+      </div>
+      <!-- rows added here -->
+    </div>
+
+    <div id="gradeScorePreview" style="margin-top:16px;padding:12px 16px;background:var(--line-soft);border-radius:10px;font-size:13px;display:none">
+      Điểm tổng kết: <strong id="gradeScoreValue" style="font-size:18px;margin-left:8px"></strong>
+      <span id="gradeScoreLabel" style="margin-left:8px;font-weight:600;padding:2px 10px;border-radius:999px;font-size:11px"></span>
+    </div>
+  `;
+
+  // Thêm 3 dòng mặc định
+  addGradeRow('QT', 'Quá trình', 40, '');
+  addGradeRow('GK', 'Giữa kỳ',  20, '');
+  addGradeRow('CK', 'Cuối kỳ',  40, '');
+
+  // Bind preview khi nhập điểm
+  document.getElementById('gradeRowsWrap').addEventListener('input', previewGradeScore);
+
+  document.getElementById('adminModal').classList.add('show');
+  S.editEntity = '__grade__';
+}
+
+function addGradeRow(code = '', name = '', weight = '', score = '') {
+  const wrap = document.getElementById('gradeRowsWrap');
+  const row = document.createElement('div');
+  row.className = 'grade-input-row';
+  row.style = 'display:grid;grid-template-columns:1fr 1.5fr 80px 80px 32px;gap:8px;margin-bottom:8px;align-items:center';
+  row.innerHTML = `
+    <input class="form-control grade-code"   value="${code}"   placeholder="QT" style="font-family:var(--font-mono);font-size:12px">
+    <input class="form-control grade-name"   value="${name}"   placeholder="Quá trình">
+    <input class="form-control grade-weight" value="${weight}" placeholder="40" type="number" min="0" max="100" style="text-align:center"
+      oninput="let v=parseFloat(this.value);if(!isNaN(v)){if(v>100)this.value=100;if(v<0)this.value=0}">
+    <input class="form-control grade-score"  value="${score}"  placeholder="0-10" type="number" min="0" max="10" step="0.1" style="text-align:center"
+      oninput="let v=parseFloat(this.value);if(!isNaN(v)){if(v>10)this.value=10;if(v<0)this.value=0}">
+    <button type="button" onclick="this.parentElement.remove();previewGradeScore()"
+      style="width:28px;height:28px;border:none;background:var(--accent-soft);color:var(--accent);border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">×</button>
+  `;
+  wrap.appendChild(row);
+}
+
+function previewGradeScore() {
+  const rows = document.querySelectorAll('.grade-input-row');
+  let total = 0, totalWeight = 0;
+  rows.forEach(row => {
+    const w = parseFloat(row.querySelector('.grade-weight').value) || 0;
+    const s = parseFloat(row.querySelector('.grade-score').value);
+    if (!isNaN(s)) { total += s * w / 100; totalWeight += w; }
+  });
+  if (totalWeight === 0) return;
+  const preview = document.getElementById('gradeScorePreview');
+  const val = document.getElementById('gradeScoreValue');
+  const lbl = document.getElementById('gradeScoreLabel');
+  preview.style.display = 'block';
+  val.textContent = total.toFixed(2);
+  if (total < 5) {
+    val.style.color = 'var(--accent)';
+    lbl.textContent = 'Cần học lại'; lbl.style.background = 'var(--accent-soft)'; lbl.style.color = 'var(--accent)';
+  } else if (total < 7) {
+    val.style.color = 'var(--amber)';
+    lbl.textContent = 'Có thể cải thiện'; lbl.style.background = 'var(--amber-soft)'; lbl.style.color = 'var(--amber)';
+  } else {
+    val.style.color = 'var(--green)';
+    lbl.textContent = 'Đạt'; lbl.style.background = 'var(--green-soft)'; lbl.style.color = 'var(--green)';
   }
 }
 
@@ -443,10 +592,66 @@ function buildForm(entity, data) {
   return `<div class="form-grid">${rows}</div>`;
 }
 
+async function saveGrade() {
+  const studentId = document.getElementById('gradeStudentSelect').value;
+  const sectionId = document.getElementById('gradeSectionId')?.value;
+  if (!sectionId) { showToast('Vui lòng chọn lớp học phần', 'error'); return; }
+
+  const rows = document.querySelectorAll('.grade-input-row');
+  const components = [];
+  let valid = true;
+  rows.forEach(row => {
+    const code   = row.querySelector('.grade-code').value.trim();
+    const name   = row.querySelector('.grade-name').value.trim();
+    const weight = parseFloat(row.querySelector('.grade-weight').value);
+    const score  = parseFloat(row.querySelector('.grade-score').value);
+    if (!code || isNaN(weight) || isNaN(score)) { valid = false; return; }
+    components.push({ componentCode: code, componentName: name || code, weightPercentage: weight, score });
+  });
+  if (!valid) { showToast('Vui lòng điền đầy đủ mã, trọng số và điểm cho mỗi thành phần', 'error'); return; }
+  if (!components.length) { showToast('Cần ít nhất 1 thành phần điểm', 'error'); return; }
+
+  const saveBtn = document.getElementById('adminModalSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Đang lưu...';
+
+  try {
+    const result = await apiFetch(`${ADMIN_API}/grade-components`, {
+      method: 'POST',
+      body: JSON.stringify({ studentId, courseSectionId: sectionId, components })
+    });
+    const labelMap = { FAILED: 'Cần học lại', IMPROVABLE: 'Cải thiện được', PASSED: 'Đạt' };
+    showToast(`Đã lưu! Tổng kết: ${result.totalScore} — ${labelMap[result.status] || result.label}`, 'success');
+    closeAdminModal();
+    await loadGrades(true);
+  } catch (e) {
+    showToast('Lỗi lưu điểm: ' + e.message, 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Lưu';
+  }
+}
+
+async function deleteGradesByScs(scsId) {
+  if (!confirm('Xóa toàn bộ điểm của môn học này?\nThao tác không thể hoàn tác.')) return;
+  try {
+    await apiFetch(`${ADMIN_API}/grade-components/section/${scsId}`, { method: 'DELETE' });
+    showToast('Đã xóa điểm môn học', 'success');
+    await loadGrades(true);
+  } catch (e) {
+    showToast('Xóa thất bại: ' + e.message, 'error');
+  }
+}
+
 async function saveModal() {
   const entity = S.editEntity;
   const id = S.editId;
   if (!entity) return;
+
+  if (entity === '__grade__') {
+    await saveGrade();
+    return;
+  }
 
   const fields = FIELDS[entity];
   const body = {};
@@ -484,7 +689,7 @@ async function saveModal() {
     closeAdminModal();
     await loadTab(entity === 'grades' ? 'grades' : entity);
     if (entity === 'grades') {
-      await loadGrades();
+      await loadGrades(true);
     }
   } catch (e) {
     showToast('Lỗi: ' + e.message, 'error');

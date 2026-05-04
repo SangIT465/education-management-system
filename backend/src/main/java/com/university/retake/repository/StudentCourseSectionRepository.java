@@ -28,4 +28,12 @@ public interface StudentCourseSectionRepository extends JpaRepository<StudentCou
            "WHERE scs.student.id = :studentId " +
            "AND scs.isActive = true")
     List<StudentCourseSection> findByStudentId(@Param("studentId") UUID studentId);
+
+    @Query("SELECT scs FROM StudentCourseSection scs " +
+           "WHERE scs.student.id = :studentId " +
+           "AND scs.courseSection.id = :sectionId " +
+           "AND scs.isActive = true")
+    java.util.Optional<StudentCourseSection> findByStudentIdAndSectionId(
+            @Param("studentId") UUID studentId,
+            @Param("sectionId") UUID sectionId);
 }
