@@ -35,6 +35,7 @@ public class HelperController {
     @GetMapping("/students")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getAllStudents() {
         List<Map<String, Object>> result = studentRepository.findAll().stream()
+                .filter(s -> Boolean.TRUE.equals(s.getIsActive()))
                 .map(s -> {
                     Map<String, Object> m = new HashMap<>();
                     m.put("id", s.getId());

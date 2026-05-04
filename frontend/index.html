@@ -26,6 +26,8 @@
                 <a href="#section-register" class="nav-pill">Đăng ký</a>
                 <a href="#section-history" class="nav-pill">Lịch sử</a>
                 <a href="admin.html" class="nav-pill nav-admin">⚙ Admin</a>
+                <div class="user-info" id="userInfo"></div>
+                <button class="nav-pill nav-logout" id="logoutBtn" onclick="doLogout()">Đăng xuất</button>
             </nav>
         </div>
     </header>
@@ -53,6 +55,9 @@
                 </svg>
             </button>
         </section>
+
+        <!-- STUDENT INFO CARD -->
+        <div id="studentInfoCard" class="student-info-card" style="display:none"></div>
 
         <!-- STATS PANEL -->
         <section class="stats-panel">

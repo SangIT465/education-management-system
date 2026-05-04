@@ -1,115 +1,150 @@
-# 🎓 NHÓM 6: ĐĂNG KÝ HỌC LẠI – ĐĂNG KÝ HỌC PHẦN
+# Nhóm 6 — Hệ thống Đăng ký Học lại
 
-> Stack: **Spring Boot (Java)** + **SQL Server** + **Vanilla JS/HTML/CSS** + **Postman**
+Stack: **Spring Boot 3.2 (Java 17)** · **SQL Server** · **Vanilla JS / HTML / CSS**
 
 ---
 
-## 📂 NỘI DUNG PROJECT
+## Cấu trúc thư mục
 
-| Thư mục | Mô tả |
+```
+group6_retake_registration/
+├── backend/        # Spring Boot REST API (port 8080)
+├── frontend/       # Giao diện HTML/CSS/JS
+│   ├── login.html      # Trang đăng nhập / đăng ký
+│   ├── index.html      # Trang sinh viên
+│   ├── admin.html      # Trang quản trị
+│   ├── css/
+│   └── js/
+├── database/       # Script SQL
+│   ├── 01_create_database.sql   # Tạo bảng
+│   ├── 02_seed_data.sql         # Dữ liệu mẫu
+│   └── 03_add_auth.sql          # Bảng tài khoản
+└── postman/        # Collection test API
+```
+
+---
+
+## Yêu cầu
+
+| Phần mềm | Phiên bản |
 |---|---|
-| `backend/` | Code Spring Boot (chạy được) |
-| `frontend/` | Code HTML/CSS/JS (chạy được) |
-| `database/` | 2 file SQL để chạy trong SSMS |
-| `postman/` | Collection để import vào Postman |
+| Java JDK | 17 trở lên |
+| SQL Server | 2019 trở lên |
+| Trình duyệt | Chrome / Edge / Firefox |
 
 ---
 
-## 📖 3 FILE HƯỚNG DẪN — ĐỌC THEO THỨ TỰ
+## Các bước chạy dự án
 
-### 1️⃣ Tạo data trong SQL Server
-👉 Mở file **`HUONG_DAN_DATABASE_SSMS.md`**
-- Cách kết nối SSMS
-- Cách chạy 2 file `01_create_database.sql` và `02_seed_data.sql`
-- Các query kiểm tra dữ liệu
-- Xử lý lỗi thường gặp
+### Bước 1 — Tạo database
 
-### 2️⃣ Chạy code (Backend + Frontend)
-👉 Mở file **`HUONG_DAN_CHAY_CODE.md`**
-- Cách chạy Spring Boot bằng IntelliJ / VS Code / Terminal
-- Cách mở Frontend
-- Demo flow hoạt động
+Mở **SSMS**, kết nối:
+- Server: `localhost`
+- Login: `sa` / Password: `123`
 
-### 3️⃣ Test API trong Postman
-👉 Mở file **`HUONG_DAN_POSTMAN.md`**
-- Cách import collection
-- Cách set biến môi trường
-- 6 test case theo thứ tự
-- Cách test các tình huống lỗi
-
----
-
-## ⚡ QUICK START (3 bước)
+Chạy lần lượt 3 file SQL (File → Open → chạy từng file bằng F5):
 
 ```
-[1] SSMS → chạy 01_create_database.sql + 02_seed_data.sql
-[2] Terminal → cd backend && mvn spring-boot:run
-[3] Trình duyệt → mở frontend/index.html
+database/01_create_database.sql   ← tạo bảng
+database/02_seed_data.sql         ← nhập dữ liệu mẫu
+database/03_add_auth.sql          ← tạo tài khoản đăng nhập
 ```
 
----
-
-## 🎯 CHỨC NĂNG CHÍNH
-
-### Nhóm chức năng 1 — Hiển thị môn học lại
-- Tự động tính điểm tổng kết: `Σ(score × weight / 100)`
-- Lọc môn có điểm `< 5.0` → môn cần học lại
-- Hiển thị kèm chi tiết điểm thành phần và lớp đang mở
-
-### Nhóm chức năng 2 — Đăng ký học lại
-- Sinh viên chọn lớp đang mở → đăng ký
-- Validate: đợt đang mở, lớp còn slot, không đăng ký trùng
-- Tự động cập nhật số sinh viên trong lớp
-
-### Nhóm chức năng 3 — Quản lý đăng ký
-- Xem lịch sử đăng ký
-- Hủy đăng ký (giảm số sinh viên trong lớp)
+Kiểm tra thành công:
+```sql
+USE university_retake_db;
+SELECT * FROM accounts;
+```
+Phải thấy ít nhất 4 tài khoản (admin + 3 sinh viên).
 
 ---
 
-## 🧪 DỮ LIỆU TEST SẴN
+### Bước 2 — Chạy Backend
 
-| Sinh viên | Mã | Kết quả |
+Mở terminal, chạy:
+
+```bash
+cd backend
+mvnw.cmd spring-boot:run
+```
+
+Đợi đến khi thấy dòng:
+```
+Started RetakeRegistrationApplication in X seconds
+```
+
+Backend chạy tại: `http://localhost:8080`
+
+> Nếu báo lỗi port 8080 đang dùng, tắt process cũ:
+> ```powershell
+> $p = Get-NetTCPConnection -LocalPort 8080 -State Listen | Select-Object -First 1
+> Stop-Process -Id $p.OwningProcess -Force
+> ```
+
+---
+
+### Bước 3 — Mở Frontend
+
+Mở file `frontend/login.html` bằng trình duyệt (double-click hoặc dùng Live Server trong VS Code).
+
+---
+
+## Tài khoản demo
+
+| Tài khoản | Mật khẩu | Quyền |
 |---|---|---|
-| Nguyễn Văn An | SV2024001 | 1 môn cần học lại (IT101: 4.40) |
-| **Trần Thị Bình** | **SV2024002** | **2 môn cần học lại (IT101: 2.90, IT102: 4.90)** ← TEST CHÍNH |
-| Lê Hoàng Cường | SV2024003 | Chưa có lịch sử |
+| `admin` | `admin123` | Admin — vào trang quản trị |
+| `SV2024001` | `sv001` | Sinh viên — Nguyễn Văn An |
+| `SV2024002` | `sv002` | Sinh viên — Trần Thị Bình |
+| `SV2024003` | `sv003` | Sinh viên — Lê Hoàng Cường |
 
 ---
 
-## 🔌 API ENDPOINTS
+## Chức năng
 
-| # | Method | Endpoint | Chức năng |
-|---|---|---|---|
-| 1 | GET | `/api/v1/students` | Danh sách sinh viên |
-| 2 | GET | `/api/v1/registration-periods/open` | Đợt đăng ký đang mở |
-| 3 | **GET** | **`/api/v1/retake/students/{id}/courses`** | **⭐ Môn cần học lại** |
-| 4 | POST | `/api/v1/registrations` | Đăng ký học phần |
-| 5 | DELETE | `/api/v1/registrations/{id}` | Hủy đăng ký |
-| 6 | GET | `/api/v1/registrations/students/{id}` | Lịch sử đăng ký |
+### Sinh viên (`index.html`)
+- Xem danh sách môn cần học lại (điểm < 5.0)
+- Xem chi tiết điểm thành phần từng môn
+- Đăng ký lớp học phần đang mở
+- Xem và hủy đăng ký
+- Thông tin cá nhân hiển thị trên header
 
----
-
-## 🗄️ BẢNG DỮ LIỆU
-
-### Bảng tự xây (Nhóm 6)
-- `registration_periods` — Đợt đăng ký
-- `course_registrations` — Chi tiết đăng ký
-- `equivalent_courses` — Môn tương đương
-
-### Bảng dùng từ nhóm khác
-- `students`, `courses`, `semesters` — Cơ bản
-- `course_sections`, `student_course_sections` — Từ Nhóm 5
-- `grade_components` — Từ Nhóm 8
+### Admin (`admin.html`)
+- Quản lý sinh viên, môn học, học kỳ
+- Quản lý lớp học phần
+- Quản lý đợt đăng ký
+- Chỉnh sửa điểm sinh viên
 
 ---
 
-## 🆘 KHI GẶP VẤN ĐỀ
+## API chính
 
-1. **Database lỗi** → đọc `HUONG_DAN_DATABASE_SSMS.md` mục "Xử lý lỗi"
-2. **Code không chạy** → đọc `HUONG_DAN_CHAY_CODE.md` mục "Lỗi thường gặp"
-3. **API không gọi được** → đọc `HUONG_DAN_POSTMAN.md` mục "Xử lý lỗi"
+| Method | Endpoint | Chức năng |
+|---|---|---|
+| POST | `/api/v1/auth/login` | Đăng nhập |
+| POST | `/api/v1/auth/register` | Đăng ký tài khoản |
+| GET | `/api/v1/students` | Danh sách sinh viên |
+| GET | `/api/v1/registration-periods/open` | Đợt đăng ký đang mở |
+| GET | `/api/v1/retake/students/{id}/courses` | Môn cần học lại |
+| GET | `/api/v1/course-sections/open` | Lớp học phần đang mở |
+| POST | `/api/v1/registrations` | Đăng ký học phần |
+| DELETE | `/api/v1/registrations/{id}` | Hủy đăng ký |
+| GET | `/api/v1/registrations/students/{id}` | Lịch sử đăng ký |
+
+Admin API: `GET/POST/PUT/DELETE /api/v1/admin/{students|courses|semesters|course-sections|registration-periods}`
 
 ---
 
-> Project được làm theo cấu trúc đề bài: 1. Mô tả chức năng → 2. Cấu trúc bảng → 3. API → 4. Giao diện → 5. Kết quả.
+## Xử lý lỗi thường gặp
+
+| Lỗi | Nguyên nhân | Cách sửa |
+|---|---|---|
+| `Port 8080 already in use` | Backend đang chạy rồi | Tắt process cũ theo hướng dẫn Bước 2 |
+| `Cannot connect to SQL Server` | SQL Server chưa chạy | Mở Services → khởi động SQL Server |
+| `Invalid object name 'accounts'` | Chưa chạy `03_add_auth.sql` | Chạy lại file SQL đó trong SSMS |
+| `Login thất bại` | Sai tài khoản/mật khẩu | Xem bảng tài khoản demo ở trên |
+| Không thấy dữ liệu mới trong SSMS | Cần refresh | Nhấn F5 trong SSMS |
+
+---
+
+> Nhóm 6 · Spring Boot + SQL Server + Vanilla JS

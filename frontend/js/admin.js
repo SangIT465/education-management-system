@@ -22,8 +22,30 @@ async function apiFetch(url, opts = {}) {
   return json.data;
 }
 
+// ====================== AUTH ======================
+function checkAdminAuth() {
+  try {
+    const raw = localStorage.getItem('currentUser');
+    if (!raw) { window.location.href = 'login.html'; return; }
+    const user = JSON.parse(raw);
+    if (!user || !user.role) { localStorage.removeItem('currentUser'); window.location.href = 'login.html'; return; }
+    if (user.role !== 'admin') { window.location.href = 'index.html'; return; }
+    const info = document.getElementById('adminUserInfo');
+    if (info) info.innerHTML = `<span class="user-badge">${user.fullName || user.username}</span>`;
+  } catch {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+  }
+}
+
+function adminLogout() {
+  localStorage.removeItem('currentUser');
+  window.location.href = 'login.html';
+}
+
 // ====================== INIT ======================
 document.addEventListener('DOMContentLoaded', async () => {
+  checkAdminAuth();
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });

@@ -10,11 +10,103 @@ const State = {
   retakeCourses: [],
   registrations: [],
   courseSections: [],
-  sectionFilter: ''
+  sectionFilter: '',
+  currentUser: null
 };
+
+// ====================== AUTH ======================
+function checkAuth() {
+  try {
+    const raw = localStorage.getItem('currentUser');
+    if (!raw) { window.location.href = 'login.html'; return; }
+    const user = JSON.parse(raw);
+    if (!user || !user.role) { localStorage.removeItem('currentUser'); window.location.href = 'login.html'; return; }
+    if (user.role === 'admin') { window.location.href = 'admin.html'; return; }
+    State.currentUser = user;
+    State.currentStudentId = user.studentId;
+    renderUserInfo(user);
+    lockStudentDropdown(user);
+  } catch {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+  }
+}
+
+function lockStudentDropdown(user) {
+  const select = document.getElementById('studentSelect');
+  if (!select) return;
+  // Ẩn dropdown, hiển thị tên sinh viên cố định
+  select.style.display = 'none';
+  const label = select.previousElementSibling;
+  const fixed = document.createElement('div');
+  fixed.className = 'select-input student-fixed';
+  fixed.textContent = `${user.studentCode || ''} — ${user.fullName || ''}`;
+  select.parentElement.appendChild(fixed);
+}
+
+function renderUserInfo(user) {
+  const info = document.getElementById('userInfo');
+  if (!info) return;
+
+  const initials = (user.fullName || user.username || '?').split(' ').slice(-2).map(w => w[0]).join('').toUpperCase();
+
+  info.innerHTML = `
+    <div class="user-badge-btn" id="userBadgeBtn">
+      <div class="user-avatar-sm">${initials}</div>
+      <span>${user.studentCode || user.username} · ${user.fullName || ''}</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="user-dropdown" id="userDropdown">
+      <div class="user-dropdown-header">
+        <div class="user-avatar-lg">${initials}</div>
+        <div>
+          <div class="user-dropdown-name">${user.fullName || '—'}</div>
+          <div class="user-dropdown-role">Sinh viên</div>
+        </div>
+      </div>
+      <div class="user-dropdown-fields">
+        <div class="user-dropdown-row">
+          <span class="udr-label">Mã SV</span>
+          <span class="udr-value mono">${user.studentCode || '—'}</span>
+        </div>
+        <div class="user-dropdown-row">
+          <span class="udr-label">Lớp</span>
+          <span class="udr-value">${user.className || '—'}</span>
+        </div>
+        <div class="user-dropdown-row">
+          <span class="udr-label">Email</span>
+          <span class="udr-value">${user.email || '—'}</span>
+        </div>
+        <div class="user-dropdown-row">
+          <span class="udr-label">Tài khoản</span>
+          <span class="udr-value mono">${user.username || '—'}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('userBadgeBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('show');
+  });
+
+  document.addEventListener('click', () => {
+    const dd = document.getElementById('userDropdown');
+    if (dd) dd.classList.remove('show');
+  });
+
+  const adminLink = document.querySelector('.nav-admin');
+  if (adminLink) adminLink.style.display = 'none';
+}
+
+function doLogout() {
+  localStorage.removeItem('currentUser');
+  window.location.href = 'login.html';
+}
 
 // ====================== INIT ======================
 document.addEventListener('DOMContentLoaded', async () => {
+  checkAuth();
   bindEvents();
   await loadInitialData();
 });
@@ -23,6 +115,7 @@ function bindEvents() {
   document.getElementById('loadBtn').addEventListener('click', onLoadData);
   document.getElementById('studentSelect').addEventListener('change', e => {
     State.currentStudentId = e.target.value || null;
+    renderStudentInfo(State.currentStudentId);
   });
   document.getElementById('periodSelect').addEventListener('change', e => {
     State.currentPeriodId = e.target.value || null;
@@ -34,6 +127,15 @@ function bindEvents() {
   document.getElementById('sectionSearch').addEventListener('input', e => {
     State.sectionFilter = e.target.value.toLowerCase();
     renderCourseSectionList();
+  });
+
+  // Active nav pill khi click
+  const navPills = document.querySelectorAll('.header-nav a.nav-pill:not(.nav-admin)');
+  navPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      navPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
   });
 }
 
@@ -71,6 +173,40 @@ async function loadInitialData() {
   } catch (err) {
     showToast('Không kết nối được server: ' + err.message, 'error');
   }
+}
+
+// ====================== STUDENT INFO ======================
+function renderStudentInfo(studentId) {
+  const card = document.getElementById('studentInfoCard');
+  if (!studentId) { card.style.display = 'none'; return; }
+
+  const s = State.students.find(s => String(s.id) === String(studentId));
+  if (!s) { card.style.display = 'none'; return; }
+
+  const initials = (s.fullName || '?').split(' ').slice(-2).map(w => w[0]).join('').toUpperCase();
+
+  card.innerHTML = `
+    <div class="student-avatar">${initials}</div>
+    <div class="student-info-fields">
+      <div class="student-info-field">
+        <span class="label">Họ và tên</span>
+        <span class="value">${s.fullName || '—'}</span>
+      </div>
+      <div class="student-info-field">
+        <span class="label">Mã sinh viên</span>
+        <span class="value mono">${s.studentCode || '—'}</span>
+      </div>
+      <div class="student-info-field">
+        <span class="label">Lớp</span>
+        <span class="value">${s.className || '—'}</span>
+      </div>
+      <div class="student-info-field">
+        <span class="label">Email</span>
+        <span class="value">${s.email || '—'}</span>
+      </div>
+    </div>
+  `;
+  card.style.display = 'flex';
 }
 
 // ====================== LOAD DATA ======================
