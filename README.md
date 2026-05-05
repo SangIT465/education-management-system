@@ -214,3 +214,48 @@ Nếu SQL Server của bạn dùng **tên server khác** hoặc **mật khẩu k
 
 # Kiểm tra SMSS đang chạy hay không:
 Get-Service -Name "MSSQL*" | Select-Object Name, Status
+
+# Truy vấn 
+USE university_retake_db;                                             
+                                                                        
+  -- SINH VIÊN                                                          
+  SELECT student_code, full_name, email, class_name
+  FROM students                                                         
+  WHERE is_active = 1;                    
+
+  -- MÔN HỌC
+  SELECT code, name, credits, description
+  FROM courses
+  WHERE is_active = 1;
+
+  -- HỌC KỲ
+  SELECT code, name, academic_year, start_date, end_date
+  FROM semesters
+  WHERE is_active = 1;
+
+  -- LỚP HỌC PHẦN
+  SELECT cs.code, c.name AS mon_hoc, s.name AS hoc_ky,
+         cs.class_type, cs.status, cs.current_students, cs.max_students
+  FROM course_sections cs
+  JOIN courses c ON cs.course_id = c.id
+  JOIN semesters s ON cs.semester_id = s.id
+  WHERE cs.is_active = 1;
+
+  -- ĐIỂM SỐ (kèm tên sinh viên và môn học)
+  SELECT st.student_code, st.full_name, c.name AS mon_hoc,
+         cs.code AS lop_hp, gc.component_name, gc.weight_percentage,
+  gc.score
+  FROM grade_components gc
+  JOIN student_course_sections scs ON gc.student_course_section_id =
+  scs.id
+  JOIN students st ON scs.student_id = st.id
+  JOIN course_sections cs ON scs.course_section_id = cs.id
+  JOIN courses c ON cs.course_id = c.id
+  ORDER BY st.student_code, c.name;
+
+  -- ĐỢT ĐĂNG KÝ
+  SELECT rp.name, s.name AS hoc_ky, rp.start_time, rp.end_time,
+         rp.min_credits, rp.max_credits, rp.is_open
+  FROM registration_periods rp
+  JOIN semesters s ON rp.semester_id = s.id
+  WHERE rp.is_active = 1; 
