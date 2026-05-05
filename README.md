@@ -210,3 +210,7 @@ Nếu SQL Server của bạn dùng **tên server khác** hoặc **mật khẩu k
 ---
 
 > Nhóm 6 · Spring Boot 3.2 + SQL Server + Vanilla JS · Hệ thống Quản lý Đăng ký Học lại
+
+
+# Kiểm tra SMSS đang chạy hay không:
+Get-Service -Name "MSSQL*" | Select-Object Name, Status
