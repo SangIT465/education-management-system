@@ -103,6 +103,13 @@
                         Thêm sinh viên
                     </button>
                 </div>
+                <div class="search-toolbar">
+                    <div class="search-wrap">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input id="search-students" class="search-input" placeholder="Tìm theo tên, mã SV, lớp..." oninput="doSearch('students',this.value)">
+                    </div>
+                    <button class="sort-btn" id="sortbtn-students" onclick="doSort('students')" title="Sắp xếp theo tên">A→Z</button>
+                </div>
                 <div class="card">
                     <table class="data-table">
                         <thead>
@@ -145,6 +152,13 @@
                             Thêm sinh viên
                         </button>
                     </div>
+                    <div class="search-toolbar">
+                        <div class="search-wrap">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input id="search-classstudents" class="search-input" placeholder="Tìm theo tên, mã SV..." oninput="doSearchClassStudents(this.value)">
+                        </div>
+                        <button class="sort-btn" id="sortbtn-classstudents" onclick="doSortClassStudents()" title="Sắp xếp theo tên">A→Z</button>
+                    </div>
                     <div class="card">
                         <table class="data-table">
                             <thead>
@@ -175,6 +189,13 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         Thêm môn học
                     </button>
+                </div>
+                <div class="search-toolbar">
+                    <div class="search-wrap">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input id="search-courses" class="search-input" placeholder="Tìm theo mã môn, tên môn..." oninput="doSearch('courses',this.value)">
+                    </div>
+                    <button class="sort-btn" id="sortbtn-courses" onclick="doSort('courses')" title="Sắp xếp theo tên">A→Z</button>
                 </div>
                 <div class="card">
                     <table class="data-table">
@@ -207,6 +228,13 @@
                         Thêm học kỳ
                     </button>
                 </div>
+                <div class="search-toolbar">
+                    <div class="search-wrap">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input id="search-semesters" class="search-input" placeholder="Tìm theo mã, tên học kỳ..." oninput="doSearch('semesters',this.value)">
+                    </div>
+                    <button class="sort-btn" id="sortbtn-semesters" onclick="doSort('semesters')" title="Sắp xếp theo tên">A→Z</button>
+                </div>
                 <div class="card">
                     <table class="data-table">
                         <thead>
@@ -238,6 +266,13 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         Thêm lớp HP
                     </button>
+                </div>
+                <div class="search-toolbar">
+                    <div class="search-wrap">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input id="search-sections" class="search-input" placeholder="Tìm theo mã, tên môn học..." oninput="doSearch('sections',this.value)">
+                    </div>
+                    <button class="sort-btn" id="sortbtn-sections" onclick="doSort('sections')" title="Sắp xếp theo mã">A→Z</button>
                 </div>
                 <div class="card">
                     <table class="data-table">
@@ -313,6 +348,13 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         Thêm đợt đăng ký
                     </button>
+                </div>
+                <div class="search-toolbar">
+                    <div class="search-wrap">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input id="search-periods" class="search-input" placeholder="Tìm theo tên đợt đăng ký..." oninput="doSearch('periods',this.value)">
+                    </div>
+                    <button class="sort-btn" id="sortbtn-periods" onclick="doSort('periods')" title="Sắp xếp theo tên">A→Z</button>
                 </div>
                 <div class="card">
                     <table class="data-table">

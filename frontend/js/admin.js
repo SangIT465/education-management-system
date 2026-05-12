@@ -12,6 +12,75 @@ const S = {
   currentClass: null, classStudents: []
 };
 
+// ====================== SEARCH & SORT ======================
+const SortState = {
+  students: 'asc', courses: 'asc', semesters: 'asc',
+  sections: 'asc', periods: 'asc', classstudents: 'asc'
+};
+
+const sortFields = {
+  students: 'fullName', courses: 'name', semesters: 'name',
+  sections: 'code', periods: 'name'
+};
+
+const searchFields = {
+  students: ['fullName','studentCode','className','email'],
+  courses: ['name','code','description'],
+  semesters: ['name','code','academicYear'],
+  sections: ['code','courseName','courseCode','semesterName'],
+  periods: ['name','semesterName']
+};
+
+function matchSearch(item, q, fields) {
+  if (!q) return true;
+  const lq = q.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  return fields.some(f => {
+    const val = (item[f] || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    return val.includes(lq);
+  });
+}
+
+function getFiltered(tab) {
+  const q = (document.getElementById('search-' + tab) || {}).value || '';
+  const dir = SortState[tab];
+  const field = sortFields[tab];
+  let data = [...S[tab === 'classstudents' ? 'classStudents' : tab]];
+  data = data.filter(item => matchSearch(item, q, searchFields[tab] || ['name']));
+  data.sort((a, b) => {
+    const va = (a[field] || '').toString().toLowerCase();
+    const vb = (b[field] || '').toString().toLowerCase();
+    return dir === 'asc' ? va.localeCompare(vb, 'vi') : vb.localeCompare(va, 'vi');
+  });
+  return data;
+}
+
+function doSearch(tab, q) { applyFilteredRender(tab); }
+
+function doSort(tab) {
+  SortState[tab] = SortState[tab] === 'asc' ? 'desc' : 'asc';
+  const btn = document.getElementById('sortbtn-' + tab);
+  if (btn) {
+    btn.textContent = SortState[tab] === 'asc' ? 'A→Z' : 'Z→A';
+    btn.classList.toggle('desc', SortState[tab] === 'desc');
+  }
+  applyFilteredRender(tab);
+}
+
+function doSearchClassStudents(q) { applyFilteredRender('classstudents'); }
+function doSortClassStudents() { doSort('classstudents'); }
+
+function applyFilteredRender(tab) {
+  const data = getFiltered(tab);
+  switch(tab) {
+    case 'students': renderStudents(data); break;
+    case 'courses': renderCourses(data); break;
+    case 'semesters': renderSemesters(data); break;
+    case 'sections': renderSections(data); break;
+    case 'periods': renderPeriods(data); break;
+    case 'classstudents': renderClassStudentsList(data); break;
+  }
+}
+
 // ====================== API HELPER ======================
 async function apiFetch(url, opts = {}) {
   const res = await fetch(url, {
@@ -179,22 +248,9 @@ async function loadClassStudents(className) {
     section.style.display = 'block';
     document.getElementById('class-student-title').textContent = `Lớp ${className}`;
     document.getElementById('class-student-count').textContent = `${students.length} sinh viên`;
-    const tbody = document.getElementById('tb-class-students');
-    if (!students.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-empty">Lớp chưa có sinh viên nào.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = students.map((s, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td><strong class="font-mono">${escHtml(s.studentCode)}</strong></td>
-        <td>${escHtml(s.fullName)}</td>
-        <td style="color:var(--ink-muted);font-size:12px">${escHtml(s.email || '—')}</td>
-        <td>
-          <button class="btn-edit" onclick="openEditClassStudent('${s.id}')">Sửa</button>
-          <button class="btn-del"  onclick="deleteItem('students','${s.id}','${escJs(s.fullName)}')">Xóa</button>
-        </td>
-      </tr>`).join('');
+    const searchEl = document.getElementById('search-classstudents');
+    if (searchEl) searchEl.value = '';
+    renderClassStudentsList(students);
   } catch (e) {
     showToast('Lỗi tải danh sách sinh viên: ' + e.message, 'error');
   }
@@ -216,6 +272,26 @@ function openCreateForClass() {
   }
 }
 
+function renderClassStudentsList(data) {
+  data = data !== undefined ? data : S.classStudents;
+  const tbody = document.getElementById('tb-class-students');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Không tìm thấy sinh viên nào.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((s, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><strong class="font-mono">${escHtml(s.studentCode)}</strong></td>
+      <td>${escHtml(s.fullName)}</td>
+      <td style="color:var(--ink-muted);font-size:12px">${escHtml(s.email || '—')}</td>
+      <td>
+        <button class="btn-edit" onclick="openEditClassStudent('${s.id}')">Sửa</button>
+        <button class="btn-del" onclick="deleteItem('students','${s.id}','${escJs(s.fullName)}')">Xóa</button>
+      </td>
+    </tr>`).join('');
+}
+
 function backToClasses() {
   S.currentClass = null;
   document.getElementById('class-student-section').style.display = 'none';
@@ -223,13 +299,14 @@ function backToClasses() {
 }
 
 // ====================== RENDER TABLES ======================
-function renderStudents() {
+function renderStudents(data) {
+  data = data || getFiltered('students');
   const tbody = document.getElementById('tb-students');
-  if (!S.students.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-empty">Chưa có sinh viên nào.</td></tr>';
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Không tìm thấy sinh viên nào.</td></tr>';
     return;
   }
-  tbody.innerHTML = S.students.map((s, i) => `
+  tbody.innerHTML = data.map((s, i) => `
     <tr>
       <td>${i + 1}</td>
       <td><strong class="font-mono">${s.studentCode}</strong></td>
@@ -243,13 +320,14 @@ function renderStudents() {
     </tr>`).join('');
 }
 
-function renderCourses() {
+function renderCourses(data) {
+  data = data || getFiltered('courses');
   const tbody = document.getElementById('tb-courses');
-  if (!S.courses.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-empty">Chưa có môn học nào.</td></tr>';
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Không tìm thấy môn học nào.</td></tr>';
     return;
   }
-  tbody.innerHTML = S.courses.map((c, i) => `
+  tbody.innerHTML = data.map((c, i) => `
     <tr>
       <td>${i + 1}</td>
       <td><strong class="font-mono">${c.code}</strong></td>
@@ -263,13 +341,14 @@ function renderCourses() {
     </tr>`).join('');
 }
 
-function renderSemesters() {
+function renderSemesters(data) {
+  data = data || getFiltered('semesters');
   const tbody = document.getElementById('tb-semesters');
-  if (!S.semesters.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-empty">Chưa có học kỳ nào.</td></tr>';
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-row">Không tìm thấy học kỳ nào.</td></tr>';
     return;
   }
-  tbody.innerHTML = S.semesters.map((s, i) => `
+  tbody.innerHTML = data.map((s, i) => `
     <tr>
       <td>${i + 1}</td>
       <td><strong class="font-mono">${s.code}</strong></td>
@@ -284,13 +363,14 @@ function renderSemesters() {
     </tr>`).join('');
 }
 
-function renderSections() {
+function renderSections(data) {
+  data = data || getFiltered('sections');
   const tbody = document.getElementById('tb-sections');
-  if (!S.sections.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-empty">Chưa có lớp học phần nào.</td></tr>';
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-row">Không tìm thấy lớp học phần nào.</td></tr>';
     return;
   }
-  tbody.innerHTML = S.sections.map((s, i) => {
+  tbody.innerHTML = data.map((s, i) => {
     const isRetake = (s.classType || '').toLowerCase().includes('học lại');
     const typeClass = isRetake ? 'reg-type-RETAKE' : 'reg-type-NEW';
     const statusColors = { open: 'var(--green)', planned: 'var(--ink-muted)', closed: 'var(--accent)', canceled: '#888' };
@@ -384,13 +464,14 @@ function renderGrades() {
   tbody.innerHTML = html;
 }
 
-function renderPeriods() {
+function renderPeriods(data) {
+  data = data || getFiltered('periods');
   const tbody = document.getElementById('tb-periods');
-  if (!S.periods.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-empty">Chưa có đợt đăng ký nào.</td></tr>';
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-row">Không tìm thấy đợt đăng ký nào.</td></tr>';
     return;
   }
-  tbody.innerHTML = S.periods.map((p, i) => {
+  tbody.innerHTML = data.map((p, i) => {
     const start = p.startTime ? new Date(p.startTime).toLocaleString('vi-VN') : '—';
     const end   = p.endTime   ? new Date(p.endTime).toLocaleString('vi-VN')   : '—';
     return `
