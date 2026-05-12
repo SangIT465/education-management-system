@@ -259,3 +259,8 @@ USE university_retake_db;
   FROM registration_periods rp
   JOIN semesters s ON rp.semester_id = s.id
   WHERE rp.is_active = 1; 
+
+# Test API
+  ttp://localhost:8080/api/v1/admin/classes
+  http://localhost:8080/api/v1/admin/students
+  http://localhost:8080/api/v1/course-sections/open
