@@ -3,311 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Quản lý dữ liệu</title>
+    <title>Admin · Quản lý đào tạo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin2.css">
 </head>
 <body>
 
-    <header class="app-header">
-        <div class="header-content">
-            <div class="brand">
-                <div class="brand-mark">ADM</div>
-                <div class="brand-text">
-                    <h1>Admin Panel</h1>
-                    <p>Quản lý dữ liệu hệ thống</p>
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="logo-icon">A</div>
+                <div class="logo-text">
+                    <span class="logo-title">AdminPanel</span>
+                    <span class="logo-sub">Quản lý đào tạo</span>
                 </div>
-            </div>
-            <nav class="header-nav">
-                <a href="index.html" class="nav-pill">← Về trang chính</a>
-                <div class="user-info" id="adminUserInfo"></div>
-                <button class="nav-pill nav-logout" onclick="adminLogout()">Đăng xuất</button>
-            </nav>
-        </div>
-    </header>
-
-    <main class="main-container">
-
-        <!-- TAB BAR -->
-        <div class="admin-tab-bar">
-            <button class="tab-btn active" data-tab="students">
-                <span class="tab-icon">👤</span> Sinh viên
-            </button>
-            <button class="tab-btn" data-tab="courses">
-                <span class="tab-icon">📚</span> Môn học
-            </button>
-            <button class="tab-btn" data-tab="semesters">
-                <span class="tab-icon">📅</span> Học kỳ
-            </button>
-            <button class="tab-btn" data-tab="sections">
-                <span class="tab-icon">🏫</span> Lớp học phần
-            </button>
-            <button class="tab-btn" data-tab="classes">
-                <span class="tab-icon">🏫</span> Lớp học
-            </button>
-            <button class="tab-btn" data-tab="grades">
-                <span class="tab-icon">📊</span> Điểm số
-            </button>
-            <button class="tab-btn" data-tab="periods">
-                <span class="tab-icon">🗓️</span> Đợt đăng ký
-            </button>
-        </div>
-
-        <!-- TAB: STUDENTS -->
-        <div id="tab-students" class="tab-panel active">
-            <div class="panel-toolbar">
-                <div>
-                    <h2>Danh sách sinh viên</h2>
-                    <p class="panel-desc">Quản lý thông tin sinh viên trong hệ thống</p>
-                </div>
-                <button class="btn-add" onclick="openCreate('students')">+ Thêm sinh viên</button>
-            </div>
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px">#</th>
-                            <th>Mã SV</th>
-                            <th>Họ và tên</th>
-                            <th>Email</th>
-                            <th>Lớp</th>
-                            <th style="width:130px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-students">
-                        <tr><td colspan="6" class="text-empty">Đang tải...</td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
 
-        <!-- TAB: CLASSES -->
-        <div id="tab-classes" class="tab-panel">
-            <div class="panel-toolbar">
-                <div>
-                    <h2>Danh sách lớp học</h2>
-                    <p class="panel-desc">Xem sinh viên theo từng lớp. Nhấn vào lớp để xem danh sách.</p>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Quản lý</div>
+            <a class="nav-item active" data-tab="students" onclick="switchTab('students')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                Sinh viên
+            </a>
+            <a class="nav-item" data-tab="classes" onclick="switchTab('classes')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                Lớp học
+            </a>
+            <a class="nav-item" data-tab="courses" onclick="switchTab('courses')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Môn học
+            </a>
+            <a class="nav-item" data-tab="semesters" onclick="switchTab('semesters')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Học kỳ
+            </a>
+            <a class="nav-item" data-tab="sections" onclick="switchTab('sections')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Lớp học phần
+            </a>
+            <a class="nav-item" data-tab="grades" onclick="switchTab('grades')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Điểm số
+            </a>
+            <a class="nav-item" data-tab="periods" onclick="switchTab('periods')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Đợt đăng ký
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                Về trang chính
+            </a>
+            <div class="sidebar-user" id="adminUserInfo">
+                <div class="user-avatar">A</div>
+                <div class="user-meta">
+                    <span class="user-name">Admin</span>
+                    <span class="user-role">Quản trị viên</span>
                 </div>
+                <button class="logout-btn" onclick="adminLogout()" title="Đăng xuất">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
             </div>
+        </div>
+    </aside>
 
-            <!-- Class cards -->
-            <div id="class-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px">
-                <div class="text-empty" style="grid-column:1/-1">Đang tải...</div>
+    <!-- MAIN CONTENT -->
+    <div class="main-wrapper">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="topbar-title" id="topbarTitle">Sinh viên</div>
+            <div class="topbar-actions">
+                <div class="topbar-badge">Live</div>
             </div>
+        </header>
 
-            <!-- Student list for selected class -->
-            <div id="class-student-section" style="display:none">
-                <div class="panel-toolbar" style="margin-bottom:12px">
-                    <div style="display:flex;align-items:center;gap:12px">
-                        <button class="btn-ghost" onclick="backToClasses()">← Quay lại</button>
-                        <h3 id="class-student-title" style="margin:0;font-size:16px;font-weight:700"></h3>
-                        <span id="class-student-count" style="font-size:13px;color:var(--ink-muted)"></span>
+        <!-- PAGE CONTENT -->
+        <main class="page-content">
+
+            <!-- TAB: STUDENTS -->
+            <div id="tab-students" class="tab-panel active">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Sinh viên</h1>
+                        <p class="page-desc">Quản lý thông tin sinh viên trong hệ thống</p>
                     </div>
-                    <button class="btn-add" onclick="openCreateForClass()">+ Thêm sinh viên</button>
+                    <button class="btn-primary" onclick="openCreate('students')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Thêm sinh viên
+                    </button>
                 </div>
-                <div class="table-wrap">
+                <div class="card">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th style="width:40px">#</th>
+                                <th style="width:48px">#</th>
                                 <th>Mã SV</th>
                                 <th>Họ và tên</th>
                                 <th>Email</th>
-                                <th style="width:130px">Thao tác</th>
+                                <th>Lớp</th>
+                                <th style="width:120px">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody id="tb-class-students">
-                            <tr><td colspan="5" class="text-empty">Đang tải...</td></tr>
+                        <tbody id="tb-students">
+                            <tr><td colspan="6" class="empty-row">Đang tải...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB: COURSES -->
-        <div id="tab-courses" class="tab-panel">
-            <div class="panel-toolbar">
-                <div>
-                    <h2>Danh sách môn học</h2>
-                    <p class="panel-desc">Quản lý các môn học trong chương trình đào tạo</p>
+            <!-- TAB: CLASSES -->
+            <div id="tab-classes" class="tab-panel">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Lớp học</h1>
+                        <p class="page-desc">Xem sinh viên theo từng lớp</p>
+                    </div>
                 </div>
-                <button class="btn-add" onclick="openCreate('courses')">+ Thêm môn học</button>
-            </div>
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px">#</th>
-                            <th>Mã môn</th>
-                            <th>Tên môn học</th>
-                            <th style="width:60px">TC</th>
-                            <th>Mô tả</th>
-                            <th style="width:130px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-courses">
-                        <tr><td colspan="6" class="text-empty">Đang tải...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: SEMESTERS -->
-        <div id="tab-semesters" class="tab-panel">
-            <div class="panel-toolbar">
-                <div>
-                    <h2>Danh sách học kỳ</h2>
-                    <p class="panel-desc">Quản lý các học kỳ trong năm học</p>
+                <div id="class-cards" class="class-grid">
+                    <div class="empty-row">Đang tải...</div>
                 </div>
-                <button class="btn-add" onclick="openCreate('semesters')">+ Thêm học kỳ</button>
-            </div>
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px">#</th>
-                            <th>Mã HK</th>
-                            <th>Tên học kỳ</th>
-                            <th>Năm học</th>
-                            <th>Ngày bắt đầu</th>
-                            <th>Ngày kết thúc</th>
-                            <th style="width:130px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-semesters">
-                        <tr><td colspan="7" class="text-empty">Đang tải...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: COURSE SECTIONS -->
-        <div id="tab-sections" class="tab-panel">
-            <div class="panel-toolbar">
-                <div>
-                    <h2>Danh sách lớp học phần</h2>
-                    <p class="panel-desc">Quản lý các lớp học phần đang và sắp mở</p>
+                <div id="class-student-section" style="display:none">
+                    <div class="page-header" style="margin-bottom:16px">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <button class="btn-ghost" onclick="backToClasses()">← Quay lại</button>
+                            <h2 id="class-student-title" style="margin:0;font-size:16px;font-weight:700"></h2>
+                            <span id="class-student-count" class="badge badge-blue"></span>
+                        </div>
+                        <button class="btn-primary" onclick="openCreateForClass()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Thêm sinh viên
+                        </button>
+                    </div>
+                    <div class="card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:48px">#</th>
+                                    <th>Mã SV</th>
+                                    <th>Họ và tên</th>
+                                    <th>Email</th>
+                                    <th style="width:120px">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-class-students">
+                                <tr><td colspan="5" class="empty-row">Đang tải...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <button class="btn-add" onclick="openCreate('sections')">+ Thêm lớp HP</button>
             </div>
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px">#</th>
-                            <th>Mã lớp HP</th>
-                            <th>Môn học</th>
-                            <th>Học kỳ</th>
-                            <th>Loại lớp</th>
-                            <th style="width:80px">Sĩ số</th>
-                            <th>Trạng thái</th>
-                            <th style="width:130px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-sections">
-                        <tr><td colspan="8" class="text-empty">Đang tải...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <!-- TAB: GRADES -->
-        <div id="tab-grades" class="tab-panel">
-            <div class="panel-toolbar">
-                <div>
-                    <h2>Quản lý điểm số</h2>
-                    <p class="panel-desc">Xem và nhập điểm thành phần. Điểm tổng kết &lt; 5.0 → tự động phân loại cần học lại.</p>
+            <!-- TAB: COURSES -->
+            <div id="tab-courses" class="tab-panel">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Môn học</h1>
+                        <p class="page-desc">Quản lý các môn học trong chương trình đào tạo</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCreate('courses')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Thêm môn học
+                    </button>
                 </div>
-                <button class="btn-add" onclick="openAddGrade()">+ Thêm điểm</button>
-            </div>
-            <div class="grade-filter-bar">
-                <label>Chọn sinh viên:</label>
-                <select id="gradeStudentSelect" class="select-input" style="min-width:280px">
-                    <option value="">— Chọn sinh viên —</option>
-                </select>
-                <button class="btn-load" onclick="loadGrades()">Tải điểm</button>
-            </div>
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px">#</th>
-                            <th>Mã môn / TP</th>
-                            <th>Tên môn học / Thành phần</th>
-                            <th style="width:100px">Lớp HP</th>
-                            <th style="width:60px"></th>
-                            <th style="width:80px">Trọng số</th>
-                            <th style="width:80px">Điểm</th>
-                            <th style="width:110px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-grades">
-                        <tr><td colspan="8" class="text-empty">Chọn sinh viên để xem điểm.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: REGISTRATION PERIODS -->
-        <div id="tab-periods" class="tab-panel">
-            <div class="panel-toolbar">
-                <div>
-                    <h2>Đợt đăng ký học phần</h2>
-                    <p class="panel-desc">Tạo và quản lý các đợt đăng ký học lại</p>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:48px">#</th>
+                                <th>Mã môn</th>
+                                <th>Tên môn học</th>
+                                <th style="width:60px">TC</th>
+                                <th>Mô tả</th>
+                                <th style="width:120px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-courses">
+                            <tr><td colspan="6" class="empty-row">Đang tải...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <button class="btn-add" onclick="openCreate('periods')">+ Thêm đợt đăng ký</button>
             </div>
-            <div class="table-wrap">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px">#</th>
-                            <th>Tên đợt đăng ký</th>
-                            <th>Học kỳ</th>
-                            <th>Bắt đầu</th>
-                            <th>Kết thúc</th>
-                            <th style="width:80px">TC min/max</th>
-                            <th style="width:80px">Trạng thái</th>
-                            <th style="width:130px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-periods">
-                        <tr><td colspan="8" class="text-empty">Đang tải...</td></tr>
-                    </tbody>
-                </table>
+
+            <!-- TAB: SEMESTERS -->
+            <div id="tab-semesters" class="tab-panel">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Học kỳ</h1>
+                        <p class="page-desc">Quản lý các học kỳ trong năm học</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCreate('semesters')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Thêm học kỳ
+                    </button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:48px">#</th>
+                                <th>Mã HK</th>
+                                <th>Tên học kỳ</th>
+                                <th>Năm học</th>
+                                <th>Bắt đầu</th>
+                                <th>Kết thúc</th>
+                                <th style="width:120px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-semesters">
+                            <tr><td colspan="7" class="empty-row">Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <!-- TAB: SECTIONS -->
+            <div id="tab-sections" class="tab-panel">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Lớp học phần</h1>
+                        <p class="page-desc">Quản lý các lớp học phần đang và sắp mở</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCreate('sections')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Thêm lớp HP
+                    </button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:48px">#</th>
+                                <th>Mã lớp HP</th>
+                                <th>Môn học</th>
+                                <th>Học kỳ</th>
+                                <th>Loại lớp</th>
+                                <th style="width:80px">Sĩ số</th>
+                                <th>Trạng thái</th>
+                                <th style="width:120px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-sections">
+                            <tr><td colspan="8" class="empty-row">Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: GRADES -->
+            <div id="tab-grades" class="tab-panel">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Điểm số</h1>
+                        <p class="page-desc">Xem và nhập điểm thành phần cho sinh viên</p>
+                    </div>
+                    <button class="btn-primary" onclick="openAddGrade()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Thêm điểm
+                    </button>
+                </div>
+                <div class="card" style="margin-bottom:16px">
+                    <div class="filter-bar">
+                        <label class="filter-label">Chọn sinh viên</label>
+                        <select id="gradeStudentSelect" class="select-input">
+                            <option value="">— Chọn sinh viên —</option>
+                        </select>
+                        <button class="btn-secondary" onclick="loadGrades()">Tải điểm</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:48px">#</th>
+                                <th>Mã môn / TP</th>
+                                <th>Tên môn học / Thành phần</th>
+                                <th style="width:100px">Lớp HP</th>
+                                <th style="width:60px"></th>
+                                <th style="width:80px">Trọng số</th>
+                                <th style="width:80px">Điểm</th>
+                                <th style="width:110px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-grades">
+                            <tr><td colspan="8" class="empty-row">Chọn sinh viên để xem điểm.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: PERIODS -->
+            <div id="tab-periods" class="tab-panel">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Đợt đăng ký</h1>
+                        <p class="page-desc">Tạo và quản lý các đợt đăng ký học lại</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCreate('periods')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Thêm đợt đăng ký
+                    </button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:48px">#</th>
+                                <th>Tên đợt đăng ký</th>
+                                <th>Học kỳ</th>
+                                <th>Bắt đầu</th>
+                                <th>Kết thúc</th>
+                                <th style="width:80px">TC min/max</th>
+                                <th style="width:80px">Trạng thái</th>
+                                <th style="width:120px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-periods">
+                            <tr><td colspan="8" class="empty-row">Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- MODAL -->
+<div id="adminModal" class="modal-backdrop">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="adminModalTitle">Tiêu đề</h3>
+            <button class="modal-close" onclick="closeAdminModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
-
-    </main>
-
-    <!-- TOAST -->
-    <div id="toast" class="toast"></div>
-
-    <!-- ADMIN MODAL -->
-    <div id="adminModal" class="admin-modal-backdrop">
-        <div class="admin-modal-card">
-            <div class="admin-modal-header">
-                <h3 id="adminModalTitle">Tiêu đề</h3>
-                <button class="modal-close-btn" onclick="closeAdminModal()">✕</button>
-            </div>
-            <div id="adminModalBody" class="admin-modal-body">
-                <!-- Dynamic form content -->
-            </div>
-            <div class="admin-modal-footer">
-                <button class="btn-ghost" onclick="closeAdminModal()">Hủy</button>
-                <button class="btn-primary" id="adminModalSaveBtn" onclick="saveModal()">Lưu</button>
-            </div>
+        <div id="adminModalBody" class="modal-body"></div>
+        <div class="modal-footer">
+            <button class="btn-ghost" onclick="closeAdminModal()">Hủy</button>
+            <button class="btn-primary" id="adminModalSaveBtn" onclick="saveModal()">Lưu thay đổi</button>
         </div>
     </div>
+</div>
 
-    <footer class="app-footer">
-        <p>Group 6 · Admin Panel · Spring Boot + SQL Server</p>
-    </footer>
-
-    <script src="js/config.js"></script>
-    <script src="js/admin.js"></script>
+<script src="js/config.js"></script>
+<script src="js/admin.js"></script>
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item[data-tab]').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelector('.nav-item[data-tab="' + tab + '"]').classList.add('active');
+    const titles = {students:'Sinh viên',classes:'Lớp học',courses:'Môn học',semesters:'Học kỳ',sections:'Lớp học phần',grades:'Điểm số',periods:'Đợt đăng ký'};
+    document.getElementById('topbarTitle').textContent = titles[tab] || tab;
+}
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+}
+</script>
 </body>
 </html>

@@ -47,9 +47,7 @@ function adminLogout() {
 // ====================== INIT ======================
 document.addEventListener('DOMContentLoaded', async () => {
   checkAdminAuth();
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-  });
+  // nav-item click handled inline in HTML
   await loadTab('students');
   await loadBaseData();
 });
@@ -83,8 +81,10 @@ function populateGradeStudentSelect() {
 
 // ====================== TABS ======================
 async function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.nav-item[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
+  const titles = {students:'Sinh viên',classes:'Lớp học',courses:'Môn học',semesters:'Học kỳ',sections:'Lớp học phần',grades:'Điểm số',periods:'Đợt đăng ký'};
+  document.getElementById('topbarTitle').textContent = titles[name] || name;
   S.tab = name;
   await loadTab(name);
 }
