@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: quanlydaotaoa-backend
+    runtime: java
+    rootDir: backend
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/retake-registration-*.jar
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+  - type: web
+    name: quanlydaotaoa-frontend
+    runtime: static
+    rootDir: frontend
+    staticPublishPath: .
