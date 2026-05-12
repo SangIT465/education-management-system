@@ -11,7 +11,7 @@ import java.util.UUID;
 public class Semester {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "uniqueidentifier")
+    @Column(columnDefinition = "uuid")
     private UUID id;
 
     @Column(nullable = false, length = 20)

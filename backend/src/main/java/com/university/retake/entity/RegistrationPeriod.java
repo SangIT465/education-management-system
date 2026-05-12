@@ -11,7 +11,7 @@ import java.util.UUID;
 public class RegistrationPeriod {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "uniqueidentifier")
+    @Column(columnDefinition = "uuid")
     private UUID id;
 
     @Column(nullable = false, length = 200)
@@ -27,7 +27,7 @@ public class RegistrationPeriod {
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
-    @Column(name = "target_config", columnDefinition = "nvarchar(max)")
+    @Column(name = "target_config", columnDefinition = "text")
     private String targetConfig;
 
     @Column(name = "max_credits")

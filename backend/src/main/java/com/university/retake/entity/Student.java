@@ -10,7 +10,7 @@ import java.util.UUID;
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "uniqueidentifier")
+    @Column(columnDefinition = "uuid")
     private UUID id;
 
     @Column(name = "student_code", nullable = false, unique = true, length = 20)
