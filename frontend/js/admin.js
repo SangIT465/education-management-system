@@ -8,7 +8,8 @@ const MAIN_API  = 'http://localhost:8080/api/v1';
 const S = {
   tab: 'students',
   students: [], courses: [], semesters: [], sections: [], periods: [], grades: [],
-  editEntity: null, editId: null
+  editEntity: null, editId: null,
+  currentClass: null, classStudents: []
 };
 
 // ====================== API HELPER ======================
@@ -104,6 +105,9 @@ async function loadTab(name) {
         S.semesters = await apiFetch(`${ADMIN_API}/semesters`);
         renderSemesters();
         break;
+      case 'classes':
+        await loadClasses();
+        break;
       case 'sections':
         [S.courses, S.semesters, S.sections] = await Promise.all([
           apiFetch(`${ADMIN_API}/courses`),
@@ -125,6 +129,97 @@ async function loadTab(name) {
   } catch (e) {
     showToast('Lỗi tải dữ liệu: ' + e.message, 'error');
   }
+}
+
+// ====================== CLASSES ======================
+async function loadClasses() {
+  try {
+    const classes = await apiFetch(`${ADMIN_API}/classes`);
+    renderClassCards(classes);
+  } catch (e) {
+    showToast('Lỗi tải danh sách lớp: ' + e.message, 'error');
+  }
+}
+
+function renderClassCards(classes) {
+  const container = document.getElementById('class-cards');
+  document.getElementById('class-student-section').style.display = 'none';
+  container.style.display = 'grid';
+
+  if (!classes.length) {
+    container.innerHTML = '<div class="text-empty" style="grid-column:1/-1">Chưa có lớp học nào.</div>';
+    return;
+  }
+
+  const colors = ['#4f8ef7', '#22c55e', '#f59e0b', '#a855f7', '#ef4444'];
+  container.innerHTML = classes.map((c, i) => `
+    <div class="class-card" onclick="loadClassStudents('${escJs(c.className)}')"
+      style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 18px;
+             cursor:pointer;transition:box-shadow .15s,transform .15s;text-align:center;
+             border-top:4px solid ${colors[i % colors.length]}"
+      onmouseover="this.style.boxShadow='0 4px 18px rgba(0,0,0,.1)';this.style.transform='translateY(-2px)'"
+      onmouseout="this.style.boxShadow='';this.style.transform=''">
+      <div style="font-size:28px;font-weight:800;color:${colors[i % colors.length]};font-family:var(--font-mono);letter-spacing:1px">
+        ${escHtml(c.className)}
+      </div>
+      <div style="font-size:13px;color:var(--ink-muted);margin-top:6px">${c.studentCount} sinh viên</div>
+      <div style="margin-top:12px;font-size:12px;color:${colors[i % colors.length]};font-weight:600">
+        Xem danh sách →
+      </div>
+    </div>`).join('');
+}
+
+async function loadClassStudents(className) {
+  S.currentClass = className;
+  try {
+    const students = await apiFetch(`${ADMIN_API}/classes/${encodeURIComponent(className)}/students`);
+    S.classStudents = students;
+    document.getElementById('class-cards').style.display = 'none';
+    const section = document.getElementById('class-student-section');
+    section.style.display = 'block';
+    document.getElementById('class-student-title').textContent = `Lớp ${className}`;
+    document.getElementById('class-student-count').textContent = `${students.length} sinh viên`;
+    const tbody = document.getElementById('tb-class-students');
+    if (!students.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-empty">Lớp chưa có sinh viên nào.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = students.map((s, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td><strong class="font-mono">${escHtml(s.studentCode)}</strong></td>
+        <td>${escHtml(s.fullName)}</td>
+        <td style="color:var(--ink-muted);font-size:12px">${escHtml(s.email || '—')}</td>
+        <td>
+          <button class="btn-edit" onclick="openEditClassStudent('${s.id}')">Sửa</button>
+          <button class="btn-del"  onclick="deleteItem('students','${s.id}','${escJs(s.fullName)}')">Xóa</button>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    showToast('Lỗi tải danh sách sinh viên: ' + e.message, 'error');
+  }
+}
+
+function openEditClassStudent(id) {
+  const student = S.classStudents.find(s => s.id === id);
+  if (student) openEdit('students', student);
+}
+
+function openCreateForClass() {
+  openCreate('students');
+  const el = document.getElementById('field_className');
+  if (el) {
+    el.value = S.currentClass;
+    el.readOnly = true;
+    el.style.background = '#f1f5f9';
+    el.style.cursor = 'not-allowed';
+  }
+}
+
+function backToClasses() {
+  S.currentClass = null;
+  document.getElementById('class-student-section').style.display = 'none';
+  document.getElementById('class-cards').style.display = 'grid';
 }
 
 // ====================== RENDER TABLES ======================
@@ -687,9 +782,11 @@ async function saveModal() {
       showToast('Thêm mới thành công!', 'success');
     }
     closeAdminModal();
-    await loadTab(entity === 'grades' ? 'grades' : entity);
-    if (entity === 'grades') {
-      await loadGrades(true);
+    if (S.currentClass && entity === 'students') {
+      await loadClassStudents(S.currentClass);
+    } else {
+      await loadTab(entity === 'grades' ? 'grades' : entity);
+      if (entity === 'grades') await loadGrades(true);
     }
   } catch (e) {
     showToast('Lỗi: ' + e.message, 'error');
@@ -717,7 +814,11 @@ async function deleteItem(entity, id, label) {
   try {
     await apiFetch(`${ADMIN_API}/${entityPath(entity)}/${id}`, { method: 'DELETE' });
     showToast('Đã xóa thành công', 'success');
-    await loadTab(entity);
+    if (S.currentClass && entity === 'students') {
+      await loadClassStudents(S.currentClass);
+    } else {
+      await loadTab(entity);
+    }
   } catch (e) {
     showToast('Xóa thất bại: ' + e.message, 'error');
   }

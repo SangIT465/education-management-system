@@ -516,6 +516,45 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.ok("Đã xóa đợt đăng ký"));
     }
 
+    // ========== CLASSES ==========
+
+    @GetMapping("/classes")
+    @Transactional(readOnly = true)
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getClasses() {
+        List<Map<String, Object>> result = studentRepository.findAll().stream()
+                .filter(s -> Boolean.TRUE.equals(s.getIsActive()) && s.getClassName() != null)
+                .collect(Collectors.groupingBy(Student::getClassName, Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(e -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("className", e.getKey());
+                    m.put("studentCount", e.getValue());
+                    return m;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @GetMapping("/classes/{className}/students")
+    @Transactional(readOnly = true)
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getStudentsByClass(
+            @PathVariable String className) {
+        List<Map<String, Object>> result = studentRepository.findAll().stream()
+                .filter(s -> Boolean.TRUE.equals(s.getIsActive()) && className.equals(s.getClassName()))
+                .map(s -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("id", s.getId());
+                    m.put("studentCode", s.getStudentCode());
+                    m.put("fullName", s.getFullName());
+                    m.put("email", s.getEmail());
+                    m.put("className", s.getClassName());
+                    return m;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
     // ========== HELPERS ==========
 
     private int toInt(Object val) {

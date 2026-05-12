@@ -45,6 +45,9 @@
             <button class="tab-btn" data-tab="sections">
                 <span class="tab-icon">🏫</span> Lớp học phần
             </button>
+            <button class="tab-btn" data-tab="classes">
+                <span class="tab-icon">🏫</span> Lớp học
+            </button>
             <button class="tab-btn" data-tab="grades">
                 <span class="tab-icon">📊</span> Điểm số
             </button>
@@ -78,6 +81,49 @@
                         <tr><td colspan="6" class="text-empty">Đang tải...</td></tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- TAB: CLASSES -->
+        <div id="tab-classes" class="tab-panel">
+            <div class="panel-toolbar">
+                <div>
+                    <h2>Danh sách lớp học</h2>
+                    <p class="panel-desc">Xem sinh viên theo từng lớp. Nhấn vào lớp để xem danh sách.</p>
+                </div>
+            </div>
+
+            <!-- Class cards -->
+            <div id="class-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px">
+                <div class="text-empty" style="grid-column:1/-1">Đang tải...</div>
+            </div>
+
+            <!-- Student list for selected class -->
+            <div id="class-student-section" style="display:none">
+                <div class="panel-toolbar" style="margin-bottom:12px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <button class="btn-ghost" onclick="backToClasses()">← Quay lại</button>
+                        <h3 id="class-student-title" style="margin:0;font-size:16px;font-weight:700"></h3>
+                        <span id="class-student-count" style="font-size:13px;color:var(--ink-muted)"></span>
+                    </div>
+                    <button class="btn-add" onclick="openCreateForClass()">+ Thêm sinh viên</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px">#</th>
+                                <th>Mã SV</th>
+                                <th>Họ và tên</th>
+                                <th>Email</th>
+                                <th style="width:130px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-class-students">
+                            <tr><td colspan="5" class="text-empty">Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
