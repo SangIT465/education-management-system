@@ -74,6 +74,9 @@
         </div>
     </aside>
 
+    <!-- SIDEBAR OVERLAY (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- MAIN CONTENT -->
     <div class="main-wrapper">
 
@@ -409,7 +412,10 @@
 <script src="js/admin.js"></script>
 <script>
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const isOpen = sidebar.classList.toggle('open');
+    overlay.classList.toggle('show', isOpen);
 }
 </script>
 </body>
