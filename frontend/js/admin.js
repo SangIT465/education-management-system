@@ -2,8 +2,8 @@
    ADMIN PANEL - Quản lý dữ liệu
    ===================================================== */
 
-const ADMIN_API = 'http://localhost:8080/api/v1/admin';
-const MAIN_API  = 'http://localhost:8080/api/v1';
+const ADMIN_API = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api/v1') + '/admin';
+const MAIN_API  = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api/v1';
 
 const S = {
   tab: 'students',
