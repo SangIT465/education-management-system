@@ -212,6 +212,24 @@ body {
     flex: 1;
 }
 
+.logout-topbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.logout-topbar-btn:hover { background: #fecaca; border-color: #f87171; }
+
 .topbar-badge {
     font-size: 11px;
     font-weight: 600;
