@@ -2,7 +2,7 @@
    API CLIENT - Kết nối với Spring Boot Backend
    ===================================================== */
 
-const API_BASE = 'http://localhost:8080/api/v1';
+const API_BASE = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api/v1';
 
 const Api = {
   /**
